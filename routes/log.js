@@ -98,7 +98,7 @@ exports.all = function (req, res, next) {
 
   try {
 
-    var getQuery = 'SELECT * FROM `air`.`logs` ORDER BY `Date` DESC, `Time` DESC';
+    var getQuery = 'SELECT * FROM `air`.`logs` ORDER BY `Date` DESC, `Time` DESC LIMIT 0,100';
 
     _connection.query(getQuery, function (err, rows, fields) {
       if (err)
