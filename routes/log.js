@@ -227,3 +227,30 @@ exports.hottest = function (req, res, next) {
     next();
   }
 };
+
+/*
+ * Gets averages.
+ */
+exports.average = function (req, res, next) {
+
+  res.setHeader('Content-Type', 'application/json');
+
+  try {
+
+    var stationId = req.params.stationId;
+    var getQuery = 'SELECT StationId, Date, AVG(TempOut) AS TempOut FROM air.logs WHERE StationId = ? GROUP BY `Date` ORDER BY `Date` DESC';
+    var params = [stationId];
+    _connection.query(getQuery, params, function (err, rows, fields) {
+      if (err)
+        throw err;
+
+      res.send(rows);
+    });
+  }
+  catch (e) {
+    res.end("error");
+  }
+  finally {
+    next();
+  }
+};

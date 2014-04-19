@@ -42,6 +42,7 @@ app.get('/logs/:stationId', log.connect, log.allByStation, log.disconnect);
 app.get('/logs/:stationId/latest', log.connect, log.latest, log.disconnect);
 app.get('/logs/:stationId/coldest', log.connect, log.coldest, log.disconnect);
 app.get('/logs/:stationId/hottest', log.connect, log.hottest, log.disconnect);
+app.get('/logs/:stationId/average', log.connect, log.average, log.disconnect);
 
 // Route: stations
 app.get('/stations', station.connect, station.all, station.disconnect);
