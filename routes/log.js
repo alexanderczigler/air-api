@@ -98,7 +98,7 @@ exports.all = function (req, res, next) {
 
   try {
 
-    var getQuery = 'SELECT * FROM `air`.`logs` ORDER BY `Date` DESC, `Time` DESC LIMIT 0,100';
+    var getQuery = 'SELECT * FROM `air`.`logs` ORDER BY `Date` DESC, `Time` DESC LIMIT 0,168';
 
     _connection.query(getQuery, function (err, rows, fields) {
       if (err)
@@ -127,7 +127,7 @@ exports.allByStation = function (req, res, next) {
   try {
 
     var stationId = req.params.stationId;
-    var getQuery = 'SELECT * FROM `air`.`logs` WHERE `StationId` = ? ORDER BY `Date` DESC, `Time` DESC LIMIT 0,100';
+    var getQuery = 'SELECT * FROM `air`.`logs` WHERE `StationId` = ? ORDER BY `Date` DESC, `Time` DESC LIMIT 0,168';
     var params = [stationId];
 
     _connection.query(getQuery, params, function (err, rows, fields) {
