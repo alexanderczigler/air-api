@@ -1,4 +1,9 @@
 air-api
 =======
 
-Weather data JSON API
+Weather data JSON API.
+
+setup
+=====
+
+ * npm install
