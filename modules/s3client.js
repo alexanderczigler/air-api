@@ -26,6 +26,7 @@ module.exports = {
   listWeatherReadings: function(station, successCallback, errorCallback) {
     var params = {
       Bucket: config.s3.bucket,
+      MaxKeys: 100,
       Prefix: station
     };
     s3.listObjects(params, function(err, data) {

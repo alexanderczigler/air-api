@@ -59,6 +59,17 @@ app.put('/readings', function(req, res) {
     res.end(500);
   });
 });
+
+app.get('/readings', function(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  s3client.listWeatherReadings('', function (data) {
+    res.send(data);
+    res.end(200);
+  }, function (error) {
+    res.end(500);
+  });
+});
+
 app.get('/readings/:station', function(req, res) {
   res.setHeader('Content-Type', 'application/json');
   s3client.listWeatherReadings(req.params.station, function (data) {
