@@ -4,10 +4,11 @@ var s3 = new AWS.S3();
 var config = require('../air.config.json');
 
 module.exports = {
-  storeWeatherReading: function(reading, successCallback, errorCallback) {
+  storeReading: function(reading, successCallback, errorCallback) {
+    reading.id = this.generateNewKey(reading.station);
     var params = {
       Bucket: config.s3.bucket,
-      Key: this.getName(reading.station),
+      Key: reading.id,
       ACL: 'public-read',
       Body: JSON.stringify(reading),
       ContentType: 'application/json',
@@ -23,10 +24,33 @@ module.exports = {
       }
     });
   },
-  listWeatherReadings: function(station, successCallback, errorCallback) {
+  getReadings: function(filter, successCallback, errorCallback) {
+    this.listReadings(filter, 100, function(reading) {
+      successCallback(reading.Contents);
+    }, errorCallback);
+  },
+  getReading: function(key, successCallback, errorCallback) {
     var params = {
       Bucket: config.s3.bucket,
-      MaxKeys: 100,
+      Key: key,
+    };
+    s3.getObject(params, function(err, data) {
+      if (err) {
+        console.log(err, err.stack);
+        errorCallback(err);
+        return;
+      }
+      if (!data.Body){
+        errorCallback('No data.Body');
+        return; 
+      }
+      successCallback(data.Body.toString());
+    });
+  },
+  listReadings: function(station, count, successCallback, errorCallback) {
+    var params = {
+      Bucket: config.s3.bucket,
+      MaxKeys: count,
       Prefix: station
     };
     s3.listObjects(params, function(err, data) {
@@ -39,21 +63,20 @@ module.exports = {
       }
     });
   },
-  getName: function(station) {
+  generateNewKey: function(station) {
     var now = new Date();
     
-    var name = station + '-';
+    var name = station + '.';
     name += now.getUTCFullYear().toString();
-    name += (now.getUTCMonth() + 1).toString();
-    name += this.pad(now.getUTCDate().toString(), 2);
-    name += this.pad(now.getUTCHours().toString(), 2);
-    name += this.pad(now.getUTCMinutes().toString(), 2);
-    name += this.pad(now.getUTCSeconds().toString(), 2);
-    name += this.pad(now.getMilliseconds().toString(), 3);
-    name += '.json';
+    name += this.padString((now.getUTCMonth() + 1).toString(), 2);
+    name += this.padString(now.getUTCDate().toString(), 2);
+    name += this.padString(now.getUTCHours().toString(), 2);
+    name += this.padString(now.getUTCMinutes().toString(), 2);
+    name += this.padString(now.getUTCSeconds().toString(), 2);
+    name += this.padString(now.getMilliseconds().toString(), 3);
     return name;
   },
-  pad: function pad(num, size) {
+  padString: function(num, size) {
     var s = num+"";
     while (s.length < size) {
       s = "0" + s

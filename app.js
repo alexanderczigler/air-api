@@ -9,6 +9,8 @@ var app = express();
 app.use(require('body-parser').json());
 app.set('port', process.env.PORT || 3000);
 
+
+
 /*
  * CORS.
  */
@@ -21,6 +23,8 @@ app.all('/*', function(req, res, next) {
 app.options(/(.*)/, function(req, res, next) {
   res.send(200); // Always respond OK on OPTIONS requests.
 });
+
+
 
 /*
  * Route: /readings
@@ -46,44 +50,66 @@ app.put('/readings', function(req, res) {
     return;
   }
 
-  if (req.body.secret !== config.postSecret) {
+  if (req.body.secret !== config.storeSecret) {
     res.send({'Message': 'Unauthorized.'});
     res.end(403);
     return;
   }
 
-  s3client.storeWeatherReading(req.body.reading, function (data) {
+  s3client.storeReading(req.body.reading, function (data) {
     res.send(data);
     res.end(200);
   }, function (error) {
+    res.send({'Error': error});
     res.end(500);
   });
 });
 
 app.get('/readings', function(req, res) {
   res.setHeader('Content-Type', 'application/json');
-  s3client.listWeatherReadings('', function (data) {
+  s3client.listReadings('', 100, function (data) {
     res.send(data);
     res.end(200);
   }, function (error) {
+    res.send({'Error': error});
     res.end(500);
   });
 });
 
-app.get('/readings/:station', function(req, res) {
+app.get('/readings/:key', function(req, res) {
   res.setHeader('Content-Type', 'application/json');
-  s3client.listWeatherReadings(req.params.station, function (data) {
+  s3client.getReading(req.params.key, function (data) {
     res.send(data);
     res.end(200);
   }, function (error) {
+    res.send({'Error': error});
     res.end(500);
   });
 });
 
-/*
- * Route: stations.
- */
-app.get('/stations', station.connect, station.all, station.disconnect);
+app.get('/stations/:station/readings', function(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  s3client.listReadings(req.params.station, 100, function (data) {
+    res.send(data);
+    res.end(200);
+  }, function (error) {
+    res.send({'Error': error});
+    res.end(500);
+  });
+});
+
+app.get('/stations/:station/readings/:dateFilter', function(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  s3client.getReadings(req.params.station + '.' + req.params.dateFilter, function (data) {
+    res.send(data);
+    res.end(200);
+  }, function (error) {
+    res.send({'Error': error});
+    res.end(500);
+  });
+});
+
+
 
 /*
  * Start.
