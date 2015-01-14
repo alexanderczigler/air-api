@@ -67,7 +67,7 @@ app.put('/readings', function(req, res) {
 
 app.get('/readings', function(req, res) {
   res.setHeader('Content-Type', 'application/json');
-  s3client.listReadings('', 100, function (data) {
+  s3client.listReadings(req.query, 100, function (data) {
     res.send(data);
     res.end(200);
   }, function (error) {
@@ -79,28 +79,6 @@ app.get('/readings', function(req, res) {
 app.get('/readings/:key', function(req, res) {
   res.setHeader('Content-Type', 'application/json');
   s3client.getReading(req.params.key, function (data) {
-    res.send(data);
-    res.end(200);
-  }, function (error) {
-    res.send({'Error': error});
-    res.end(500);
-  });
-});
-
-app.get('/stations/:station/readings', function(req, res) {
-  res.setHeader('Content-Type', 'application/json');
-  s3client.listReadings(req.params.station, 100, function (data) {
-    res.send(data);
-    res.end(200);
-  }, function (error) {
-    res.send({'Error': error});
-    res.end(500);
-  });
-});
-
-app.get('/stations/:station/readings/:dateFilter', function(req, res) {
-  res.setHeader('Content-Type', 'application/json');
-  s3client.getReadings(req.params.station + '.' + req.params.dateFilter, function (data) {
     res.send(data);
     res.end(200);
   }, function (error) {

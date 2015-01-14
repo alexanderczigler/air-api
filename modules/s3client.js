@@ -47,11 +47,21 @@ module.exports = {
       successCallback(data.Body.toString());
     });
   },
-  listReadings: function(station, count, successCallback, errorCallback) {
+  listReadings: function(query, count, successCallback, errorCallback) {
+    var prefix = '';
+
+    if (query.station) {
+      prefix += query.station;
+    }
+
+    if (query.date) {
+      prefix += '.' + query.date;
+    }
+
     var params = {
       Bucket: config.s3.bucket,
       MaxKeys: count,
-      Prefix: station
+      Prefix: prefix
     };
     s3.listObjects(params, function(err, data) {
       if (err) {
@@ -59,7 +69,7 @@ module.exports = {
         errorCallback(err);
       }
       else {
-        successCallback(data);
+        successCallback(data.Contents);
       }
     });
   },
